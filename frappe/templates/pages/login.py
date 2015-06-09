@@ -267,30 +267,13 @@ def update_oauth_user(user, data, provider):
 	else:
 		user = frappe.get_doc("User", user)
 
-	if provider=="facebook" and not user.get("fb_userid"):
-		save = True
-		user.update({
-			"fb_username": data.get("username"),
-			"fb_userid": data["id"],
-			"user_image": "https://graph.facebook.com/{id}/picture".format(id=data["id"])
-		})
-
-	elif provider=="google" and not user.get("google_userid"):
-		save = True
-		user.google_userid = data["id"]
-
-	elif provider=="github" and not user.get("github_userid"):
-		save = True
-		user.github_userid = data["id"]
-		user.github_username = data["login"]
-
 	if save:
 		user.flags.ignore_permissions = True
 		user.flags.no_welcome_mail = True
 		user.save()
 
 def get_first_name(data):
-	return data.get("first_name") or data.get("given_name") or data.get("name")
+	return data.get("first_name") or data.get("given_name") or data.get("name") or data.get("email")
 
 def get_last_name(data):
 	return data.get("last_name") or data.get("family_name")
