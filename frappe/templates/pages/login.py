@@ -11,6 +11,15 @@ class SignupDisabledError(frappe.PermissionError): pass
 
 no_cache = True
 
+WEIXIN_CORPID = "wxb0a52a35354404e0"
+WEIXIN_CORPSECRET = frappe.local.conf.wx_secret
+
+WEIXIN_ACCESSTOKEN_ADDR = "https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=" + WEIXIN_CORPID + "&corpsecret=" + WEIXIN_CORPSECRET
+WEIXIN_USERINFO_ADDR = "https://qyapi.weixin.qq.com/cgi-bin/user/getuserinfo?"
+WEIXIN_OAUTH2_AUTHORIZE_ADDR = "https://open.weixin.qq.com/connect/oauth2/authorize?"
+WEIXIN_SENDMSG_ADDR = "https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token="
+WEIXIN_AUTH_SUCC = "https://qyapi.weixin.qq.com/cgi-bin/user/authsucc?access_token="
+
 def get_context(context):
 	if frappe.session.user != "Guest" and frappe.session.data.user_type=="System User":
 		frappe.local.flags.redirect_location = "/desk"
@@ -62,24 +71,24 @@ oauth2_providers = {
 	},
 
 	"facebook": {
-		"flow_params": {
-			"name": "facebook",
-			"authorize_url": "https://www.facebook.com/dialog/oauth",
-			"access_token_url": "https://graph.facebook.com/oauth/access_token",
-			"base_url": "https://graph.facebook.com"
-		},
+        "flow_params": {
+            "name": "weixin",
+            "authorize_url": "https://open.weixin.qq.com/connect/oauth2/authorize",
+            "access_token_url": "https://qyapi.weixin.qq.com/cgi-bin/gettoken",
+            "base_url": "https://qyapi.weixin.qq.com"
+        },
 
-		"redirect_uri": "/api/method/frappe.templates.pages.login.login_via_facebook",
+        "redirect_uri": "/api/method/frappe.templates.pages.login.login_via_weixin",
 
-		"auth_url_data": {
-			"display": "page",
-			"response_type": "code",
-			"scope": "email,public_profile"
-		},
+        "auth_url_data": {
+            "response_type": "code",
+            'scope': 'snsapi_base',
+            'appid': WEIXIN_CORPID,
+        },
 
-		# relative to base_url
-		"api_endpoint": "me"
-	}
+        # relative to base_url
+        "api_endpoint": "cgi-bin/user/getuserinfo"
+    }
 }
 
 def get_oauth_keys(provider):
@@ -136,6 +145,36 @@ def login_via_google(code):
 def login_via_github(code):
 	login_via_oauth2("github", code)
 
+@frappe.whitelist(allow_guest=True)
+def login_via_weixin(code):
+    provider = 'weixin'
+    token = getAccessToken()
+    url = WEIXIN_USERINFO_ADDR + "access_token=" + token + "&code=" + code
+    resp = urllib2.urlopen(url)
+    description = json.loads(resp.read())
+    userId = description.get('UserId', None)
+
+    if userId == None:
+        frappe.throw(url)
+    else:
+        login_oauth_user({'email': userId + "@rd.com", }, provider=provider)
+        authSucc(token, userId)
+
+
+def authSucc(token, userid):
+    url_auth_suc = WEIXIN_AUTH_SUCC + token + "&userid=" + userid
+    resp = urllib2.urlopen(url_auth_suc)
+    description = json.loads(resp.read())
+    print description
+
+
+def getAccessToken():
+    resp = urllib2.urlopen(WEIXIN_ACCESSTOKEN_ADDR)
+    description = json.loads(resp.read())
+    token = description["access_token"]
+    return token
+
+        
 @frappe.whitelist(allow_guest=True)
 def login_via_facebook(code):
 	login_via_oauth2("facebook", code)
