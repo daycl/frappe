@@ -6,6 +6,7 @@ import frappe
 import json
 import frappe.utils
 from frappe import _
+import urllib2
 
 class SignupDisabledError(frappe.PermissionError): pass
 
