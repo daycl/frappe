@@ -13,7 +13,7 @@ class SignupDisabledError(frappe.PermissionError): pass
 no_cache = True
 
 WEIXIN_CORPID = "wxb0a52a35354404e0"
-WEIXIN_CORPSECRET = frappe.local.conf.wx_secret
+WEIXIN_CORPSECRET = frappe.local.conf.wx_secret or ""
 
 WEIXIN_ACCESSTOKEN_ADDR = "https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=" + WEIXIN_CORPID + "&corpsecret=" + WEIXIN_CORPSECRET
 WEIXIN_USERINFO_ADDR = "https://qyapi.weixin.qq.com/cgi-bin/user/getuserinfo?"
