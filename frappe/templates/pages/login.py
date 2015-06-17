@@ -174,7 +174,7 @@ def authSucc(token, userid):
 
 def getAccessToken(appid):
 	addr = WEIXIN_ACCESSTOKEN_ADDR + appid + "&corpsecret=" + WEIXIN_CORPSECRET
-	resp = urllib2.urlopen(adr)
+	resp = urllib2.urlopen(addr)
 	description = json.loads(resp.read())
 	token = description["access_token"]
 	return token
