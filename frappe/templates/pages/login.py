@@ -12,7 +12,7 @@ class SignupDisabledError(frappe.PermissionError): pass
 
 no_cache = True
 
-WEIXIN_CORPID = "wxb0a52a35354404e0"
+WEIXIN_CORPID = ""
 WEIXIN_CORPSECRET = frappe.local.conf.wx_secret or ""
 
 WEIXIN_ACCESSTOKEN_ADDR = "https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=" + WEIXIN_CORPID + "&corpsecret=" + WEIXIN_CORPSECRET
@@ -147,8 +147,9 @@ def login_via_github(code):
 	login_via_oauth2("github", code)
 
 @frappe.whitelist(allow_guest=True)
-def login_via_weixin(code):
+def login_via_weixin(code,appid,path):
     provider = 'weixin'
+    WEIXIN_CORPID = appid
     token = getAccessToken()
     url = WEIXIN_USERINFO_ADDR + "access_token=" + token + "&code=" + code
     resp = urllib2.urlopen(url)
@@ -160,6 +161,7 @@ def login_via_weixin(code):
     else:
         login_oauth_user({'email': userId + "@rd.com", }, provider=provider)
         authSucc(token, userId)
+    frappe.local.response["location"] = "desk#List/" + path
 
 
 def authSucc(token, userid):
