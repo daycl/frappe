@@ -15,7 +15,7 @@ no_cache = True
 WEIXIN_CORPID = ""
 WEIXIN_CORPSECRET = frappe.local.conf.wx_secret or ""
 
-WEIXIN_ACCESSTOKEN_ADDR = "https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=" + WEIXIN_CORPID + "&corpsecret=" + WEIXIN_CORPSECRET
+WEIXIN_ACCESSTOKEN_ADDR = "https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid="
 WEIXIN_USERINFO_ADDR = "https://qyapi.weixin.qq.com/cgi-bin/user/getuserinfo?"
 WEIXIN_OAUTH2_AUTHORIZE_ADDR = "https://open.weixin.qq.com/connect/oauth2/authorize?"
 WEIXIN_SENDMSG_ADDR = "https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token="
@@ -150,8 +150,8 @@ def login_via_github(code):
 def login_via_weixin(code,appid,path):
     provider = 'weixin'
     WEIXIN_CORPID = appid
-    print appid
-    token = getAccessToken()
+
+    token = getAccessToken(appid)
     url = WEIXIN_USERINFO_ADDR + "access_token=" + token + "&code=" + code
     resp = urllib2.urlopen(url)
     description = json.loads(resp.read())
@@ -172,11 +172,12 @@ def authSucc(token, userid):
     print description
 
 
-def getAccessToken():
-    resp = urllib2.urlopen(WEIXIN_ACCESSTOKEN_ADDR)
-    description = json.loads(resp.read())
-    token = description["access_token"]
-    return token
+def getAccessToken(appid):
+	addr = WEIXIN_ACCESSTOKEN_ADDR + appid + "&corpsecret=" + WEIXIN_CORPSECRET
+	resp = urllib2.urlopen(adr)
+	description = json.loads(resp.read())
+	token = description["access_token"]
+	return token
 
         
 @frappe.whitelist(allow_guest=True)
