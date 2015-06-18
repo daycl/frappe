@@ -162,7 +162,7 @@ def login_via_weixin(code,appid,path):
     else:
         login_oauth_user({'email': userId + "@rd.com", }, provider=provider)
         authSucc(token, userId)
-    frappe.local.response["location"] = "desk#List/" + path
+    frappe.local.response["location"] = path
 
 
 def authSucc(token, userid):
