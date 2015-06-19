@@ -148,9 +148,6 @@ def login_via_github(code):
 
 @frappe.whitelist(allow_guest=True)
 def login_via_weixin(code, appid, path):
-    message = "code=%s,appid=%s,path=%s" % (code, appid, path)
-    print "print:"+message
-    frappe.log("log:"+message)
     provider = 'weixin'
     WEIXIN_CORPID = appid
 
