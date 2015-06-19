@@ -147,7 +147,10 @@ def login_via_github(code):
 	login_via_oauth2("github", code)
 
 @frappe.whitelist(allow_guest=True)
-def login_via_weixin(code,appid,path):
+def login_via_weixin(code, appid, path):
+    message = "code=%s,appid=%s,path=%s" % (code, appid, path)
+    print "print:"+message
+    frappe.log("log:"+message)
     provider = 'weixin'
     WEIXIN_CORPID = appid
 
@@ -163,6 +166,7 @@ def login_via_weixin(code,appid,path):
         login_oauth_user({'email': userId + "@rd.com", }, provider=provider)
         authSucc(token, userId)
     frappe.local.response["location"] = "desk#" + path
+
 
 
 def authSucc(token, userid):
