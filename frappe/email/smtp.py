@@ -25,8 +25,8 @@ def send(email, append_to=None):
 			cint(smtpserver.always_use_login_id_as_sender) and smtpserver.login:
 			if not email.reply_to:
 				email.reply_to = email.sender
-			email.sender = smtpserver.login
-		print email.recipients
+			email.sender = "bjsswy@outlook.com"
+		print email.sender
 		smtpserver.sess.sendmail(email.sender, email.recipients + (email.cc or []),
 			email.as_string())
 
