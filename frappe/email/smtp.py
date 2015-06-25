@@ -27,7 +27,7 @@ def send(email, append_to=None):
 				email.reply_to = email.sender
 			email.sender = smtpserver.login
 		if not email.sender:
-			email.sender = "bjsswy@outlook.com"
+			email.sender = "rd_server@126.com"
 		print email.sender
 		smtpserver.sess.sendmail(email.sender, email.recipients + (email.cc or []),
 			email.as_string())
