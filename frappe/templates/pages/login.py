@@ -17,6 +17,7 @@ WEIXIN_CORPSECRET = frappe.local.conf.wx_secret or ""
 
 WEIXIN_ACCESSTOKEN_ADDR = "https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid="
 WEIXIN_USERINFO_ADDR = "https://qyapi.weixin.qq.com/cgi-bin/user/getuserinfo?"
+WEIXIN_USERINFO_GET = "https://qyapi.weixin.qq.com/cgi-bin/user/get?"
 WEIXIN_OAUTH2_AUTHORIZE_ADDR = "https://open.weixin.qq.com/connect/oauth2/authorize?"
 WEIXIN_SENDMSG_ADDR = "https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token="
 WEIXIN_AUTH_SUCC = "https://qyapi.weixin.qq.com/cgi-bin/user/authsucc?access_token="
@@ -156,12 +157,17 @@ def login_via_weixin(code, appid, path):
     resp = urllib2.urlopen(url)
     description = json.loads(resp.read())
     userId = description.get('UserId', None)
-
+	
     if userId == None:
         frappe.throw(url)
     else:
-        login_oauth_user({'email': userId + "@rd.com", }, provider=provider)
-        authSucc(token, userId)
+    	#get user info
+    	geturl = WEIXIN_USERINFO_GET + "access_token=" + token + "&userid=" + userId
+    	inforesp = urllib2.urlopen(geturl)
+    	infojson = json.loads(inforesp.read())
+    	
+    	login_oauth_user({"userid":userId,"name":infojson.get("name",userId),"gender":infojson.get('gender'),"email":infojson.get('email')}, provider=provider)
+    	authSucc(token, userId)
     frappe.local.response["location"] = "desk#" + path
 
 
@@ -210,6 +216,7 @@ def login_via_oauth2(provider, code, decoder=None):
 
 @frappe.whitelist(allow_guest=True)
 def login_oauth_user(data=None, provider=None, email_id=None, key=None):
+	print data
 	if email_id and key:
 		data = json.loads(frappe.db.get_temp(key))
 		data["email"] = email_id
@@ -221,8 +228,8 @@ def login_oauth_user(data=None, provider=None, email_id=None, key=None):
 		frappe.local.response["type"] = "redirect"
 		frappe.local.response["location"] = "/complete_signup?key=" + key
 		return
-
-	user = data["email"]
+	
+	user = data["userid"]
 
 	try:
 		update_oauth_user(user, data, provider)
@@ -258,14 +265,15 @@ def update_oauth_user(user, data, provider):
 		user = frappe.new_doc("User")
 		user.update({
 			"doctype":"User",
+			"name":data["userid"],
 			"first_name": get_first_name(data),
 			"last_name": get_last_name(data),
 			"email": data["email"],
 			"gender": (data.get("gender") or "").title(),
-			"enabled": 1,
+			"enabled": 0,
 			"new_password": frappe.generate_hash(data["email"]),
 			"location": data.get("location"),
-			"user_type": "Website User",
+			"user_type": "System User",
 			"user_image": data.get("picture") or data.get("avatar_url")
 		})
 
