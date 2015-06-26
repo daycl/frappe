@@ -263,13 +263,22 @@ def update_oauth_user(user, data, provider):
 
 		save = True
 		user = frappe.new_doc("User")
+		gender = ""
+		sex = (data.get("gender") or "")
+		if (sex == "1"):
+			gender = "Male"
+		elif (sex == "2"):
+			gender = "Female"
+		elif (sex == "3"):
+			gender = "Other"
+		
 		user.update({
 			"doctype":"User",
 			"name":data["userid"],
 			"first_name": get_first_name(data),
 			"last_name": get_last_name(data),
 			"email": data["email"],
-			"gender": (data.get("gender") or "").title(),
+			"gender": gender.title(),
 			"enabled": 0,
 			"new_password": frappe.generate_hash(data["email"]),
 			"location": data.get("location"),
