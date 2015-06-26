@@ -229,7 +229,7 @@ def login_oauth_user(data=None, provider=None, email_id=None, key=None):
 		frappe.local.response["location"] = "/complete_signup?key=" + key
 		return
 	
-	user = data["userid"]
+	user = data["email"]
 
 	try:
 		update_oauth_user(user, data, provider)
@@ -274,7 +274,7 @@ def update_oauth_user(user, data, provider):
 		
 		user.update({
 			"doctype":"User",
-			"name":data["userid"],
+			# "name":data["userid"],
 			"first_name": get_first_name(data),
 			"last_name": get_last_name(data),
 			"email": data["email"],
