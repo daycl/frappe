@@ -235,6 +235,7 @@ def login_oauth_user(data=None, provider=None, email_id=None, key=None):
 		return frappe.respond_as_web_page("Signup is Disabled", "Sorry. Signup from Website is disabled.",
 			success=False, http_status_code=403)
 
+	frappe.local.login_manager.clear_cookies()
 	frappe.local.login_manager.user = user
 	frappe.local.login_manager.post_login()
 
