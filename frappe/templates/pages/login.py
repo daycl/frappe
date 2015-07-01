@@ -168,8 +168,9 @@ def login_via_weixin(code, appid, path):
     	
     	login_oauth_user({"userid":userId,"name":infojson.get("name",userId),"gender":infojson.get('gender'),"email":infojson.get('email')}, provider=provider)
     	authSucc(token, userId)
-    frappe.local.response["location"] = "desk#" + path + "&from=weixin"
-
+    location = "desk#" + path + "&from=weixin"
+    frappe.local.response["location"] = location
+    print "login by weixin: ", location
 
 
 def authSucc(token, userid):
@@ -216,7 +217,6 @@ def login_via_oauth2(provider, code, decoder=None):
 
 @frappe.whitelist(allow_guest=True)
 def login_oauth_user(data=None, provider=None, email_id=None, key=None):
-	print data
 	if email_id and key:
 		data = json.loads(frappe.db.get_temp(key))
 		data["email"] = email_id
