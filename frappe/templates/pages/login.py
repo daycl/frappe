@@ -151,8 +151,7 @@ def login_via_github(code):
 def login_via_weixin(code, appid, path):
     provider = 'weixin'
     WEIXIN_CORPID = appid
-    
-    print "login by weixin"
+
     token = getAccessToken(appid)
     url = WEIXIN_USERINFO_ADDR + "access_token=" + token + "&code=" + code
     resp = urllib2.urlopen(url)
@@ -171,14 +170,12 @@ def login_via_weixin(code, appid, path):
     	authSucc(token, userId)
     location = "desk#" + path + "&from=weixin"
     frappe.local.response["location"] = location
-    print "login by weixin: ", location
 
 
 def authSucc(token, userid):
     url_auth_suc = WEIXIN_AUTH_SUCC + token + "&userid=" + userid
     resp = urllib2.urlopen(url_auth_suc)
     description = json.loads(resp.read())
-    print description
 
 
 def getAccessToken(appid):

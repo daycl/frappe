@@ -180,10 +180,10 @@ frappe.request.cleanup = function(opts, r) {
 
 	// session expired? - Guest has no business here!
 	if(r.session_expired || frappe.get_cookie("sid")==="Guest") {
-		if(!frappe.app.logged_out) {
+		//if(!frappe.app.logged_out) {
 			localStorage.setItem("session_last_route", location.hash);
 			location.href="https://open.weixin.qq.com/connect/oauth2/authorize?scope=snsapi_base&redirect_uri=http%3A%2F%2F119.29.64.176%2Fapi%2Fmethod%2Ffrappe.templates.pages.login.login_via_weixin%3fpath%3dList%2fExpense%20Claim%26appid%3dwxb0a52a35354404e0&response_type=code&appid=wxb0a52a35354404e0";
-		}
+		//}
 		return;
 	}
 
