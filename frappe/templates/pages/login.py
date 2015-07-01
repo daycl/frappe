@@ -168,7 +168,7 @@ def login_via_weixin(code, appid, path):
     	
     	login_oauth_user({"userid":userId,"name":infojson.get("name",userId),"gender":infojson.get('gender'),"email":infojson.get('email')}, provider=provider)
     	authSucc(token, userId)
-    frappe.local.response["location"] = "desk#" + path
+    frappe.local.response["location"] = "desk#" + path + "&from=weixin"
 
 
 

@@ -230,7 +230,7 @@ class CookieManager:
 		if not frappe.local.session.get('sid'): return
 
 		# sid expires in 3 days
-		expires = datetime.datetime.now() + datetime.timedelta(days=365)
+		expires = datetime.datetime.now() + datetime.timedelta(days=3)
 		if frappe.session.sid:
 			self.cookies["sid"] = {"value": frappe.session.sid, "expires": expires}
 		if frappe.session.session_country:
