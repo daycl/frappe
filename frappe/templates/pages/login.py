@@ -151,7 +151,8 @@ def login_via_github(code):
 def login_via_weixin(code, appid, path):
     provider = 'weixin'
     WEIXIN_CORPID = appid
-
+    
+    print "login by weixin"
     token = getAccessToken(appid)
     url = WEIXIN_USERINFO_ADDR + "access_token=" + token + "&code=" + code
     resp = urllib2.urlopen(url)
