@@ -25,7 +25,7 @@ frappe.ui.app_icon = {
 			icon = '<object>'+ icon+'</object>';
 		} 
 		else if(iconType == "jpg" || iconType == "png"){
-			icon = '<i class="'+ icon+'" title="' + module.label + '">' + '<img src="' + icon + '">' + '</i>';
+			icon = '<i class="octicon" title="' + module.label + '">' + '<img src="' + icon + '">' + '</i>';
 		} else {
 			icon = '<i class="'+ icon+'" title="' + module.label + '"></i>';
 		}
