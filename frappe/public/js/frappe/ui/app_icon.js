@@ -12,7 +12,8 @@ frappe.ui.app_icon = {
 		var module = modules[app]
 		var icon = module.icon;
 		var color = module.color;
-		if(icon.split(".").slice(-1)[0]==="svg") {
+		var iconType = icon.split(".").slice(-1)[0];
+		if(iconType === "svg") {
 			$.ajax({
 				url: frappe.urllib.get_full_url(icon),
 				dataType: "text",
@@ -22,6 +23,9 @@ frappe.ui.app_icon = {
 				}
 			})
 			icon = '<object>'+ icon+'</object>';
+		} 
+		else if(iconType == "jpg" || iconType == "png"){
+			icon = '<i class="'+ icon+'" title="' + module.label + '">' + '<img src="' + icon + '">' + '</i>';
 		} else {
 			icon = '<i class="'+ icon+'" title="' + module.label + '"></i>';
 		}
