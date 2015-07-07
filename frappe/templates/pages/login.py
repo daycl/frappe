@@ -235,12 +235,13 @@ def login_oauth_user(data=None, provider=None, email_id=None, key=None):
 		return frappe.respond_as_web_page("Signup is Disabled", "Sorry. Signup from Website is disabled.",
 			success=False, http_status_code=403)
 
+	if result ==0 :
+		return
+	
 	# frappe.local.login_manager.clear_cookies()
 	frappe.local.login_manager.user = user
 	frappe.local.login_manager.post_login()
 	
-	if result ==0 :
-		return
 	# redirect!
 	frappe.local.response["type"] = "redirect"
 
@@ -295,7 +296,7 @@ def update_oauth_user(user, data, provider):
 		user = frappe.get_doc("User", user)
 		if (user.enabled == 0):
 			frappe.respond_as_web_page("Login failed",
-				"<pre>Account is disabled!</pre>",
+				"<pre>User is disabled!</pre>",
 				http_status_code=401)
 			response = frappe.website.render.render("message", http_status_code=401)
 			return 0
