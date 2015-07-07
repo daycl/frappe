@@ -146,7 +146,7 @@ def login_via_google(code):
 @frappe.whitelist(allow_guest=True)
 def login_via_github(code):
 	login_via_oauth2("github", code)
-
+	
 @frappe.whitelist(allow_guest=True)
 def login_via_weixin(code, appid, path):
     provider = 'weixin'
@@ -228,9 +228,9 @@ def login_oauth_user(data=None, provider=None, email_id=None, key=None):
 		return
 	
 	user = data["email"]
-
+	result = 1
 	try:
-		update_oauth_user(user, data, provider)
+		result = update_oauth_user(user, data, provider)
 	except SignupDisabledError:
 		return frappe.respond_as_web_page("Signup is Disabled", "Sorry. Signup from Website is disabled.",
 			success=False, http_status_code=403)
@@ -238,7 +238,9 @@ def login_oauth_user(data=None, provider=None, email_id=None, key=None):
 	# frappe.local.login_manager.clear_cookies()
 	frappe.local.login_manager.user = user
 	frappe.local.login_manager.post_login()
-
+	
+	if result ==0 :
+		return
 	# redirect!
 	frappe.local.response["type"] = "redirect"
 
@@ -255,10 +257,11 @@ def update_oauth_user(user, data, provider):
 	save = False
 
 	if not frappe.db.exists("User", user):
-		frappe.local.response['message'] = "Not found user , please contract system manager."
-		raise frappe.AuthenticationError
-
-		frappe.throw(_("Not found user , please contract system manager."), frappe.PermissionError)
+		frappe.respond_as_web_page("Not found user",
+				"<pre>please contract system manager.</pre>",
+				http_status_code=401)
+		response = frappe.website.render.render("message", http_status_code=401)
+		return 0
 		# is signup disabled?
 		if frappe.utils.cint(frappe.db.get_single_value("Website Settings", "disable_signup")):
 			raise SignupDisabledError
@@ -291,13 +294,18 @@ def update_oauth_user(user, data, provider):
 	else:
 		user = frappe.get_doc("User", user)
 		if (user.enabled == 0):
-			frappe.local.response['message'] = "Your account is disabled, please contract system manager."
-			raise frappe.AuthenticationError
+			frappe.respond_as_web_page("Login failed",
+				"<pre>Account is disabled!</pre>",
+				http_status_code=401)
+			response = frappe.website.render.render("message", http_status_code=401)
+			return 0
 
 	if save:
 		user.flags.ignore_permissions = True
 		user.flags.no_welcome_mail = True
 		user.save()
+		
+	return 1
 
 def get_first_name(data):
 	return data.get("first_name") or data.get("given_name") or data.get("name") or data.get("email")
