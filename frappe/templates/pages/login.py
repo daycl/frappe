@@ -255,7 +255,7 @@ def update_oauth_user(user, data, provider):
 	save = False
 
 	if not frappe.db.exists("User", user):
-
+		frappe.throw(_("Not found user , please contract system manager."), frappe.PermissionError)
 		# is signup disabled?
 		if frappe.utils.cint(frappe.db.get_single_value("Website Settings", "disable_signup")):
 			raise SignupDisabledError
@@ -287,6 +287,8 @@ def update_oauth_user(user, data, provider):
 
 	else:
 		user = frappe.get_doc("User", user)
+		if (user.enabled == 0):
+			frappe.throw(_("You are not permitted to access this page."), frappe.PermissionError)
 
 	if save:
 		user.flags.ignore_permissions = True
